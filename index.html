@@ -37,6 +37,7 @@
     <style type="text/css">
       @import url('https://s3.amazonaws.com/data.minnpost/js/flurid-2.1/flurid.min.css');
       @import url('https://s3.amazonaws.com/data.minnpost/js/qtip2-master-20121022/jquery.qtip.min.css');
+      @import url('https://s3.amazonaws.com/data.minnpost/js/jquery-no-ui-slider-2.5.5/nouislider.css');
     </style>
     <style type="text/css">
       #minnpost-dayton-taxes-game {
@@ -74,6 +75,47 @@
         vertical-align: middle;
         height: 100%;
         line-height: 100%;
+      }
+      
+      
+      #minnpost-dayton-taxes-game .number {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+      }
+      
+      #tax-rate-slider {
+        position: relative;
+        width: 50%;
+        margin: 0 auto;
+      }
+      #tax-rate-slider .noUi-midBar {
+        background: #24B616;
+        background: -webkit-linear-gradient(top, #24B616, #24B616);
+        background: -moz-linear-gradient(top, #24B616, #24B616);
+        background: linear-gradient(top, #24B616, #24B616);
+        border: 1px solid #197F10;
+      }
+      #tax-rate-slider .noUi-handle > div {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        background-color: #F1E98E;
+      }
+      #tax-rate-slider .noUi-handle > div:hover,
+      #tax-rate-slider .noUi-handle > div.noUi-activeHandle {
+        border: 1px solid #B65916;
+        background-color: #F1E98E;
+      }
+      
+      #tax-rate-slider .noUi-handle > div {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+      }
+      
+      .tax-rate-value {
+        font-size: 2em;
+        text-align: center;
+        line-height: 2em;
       }
       
       /**
@@ -118,8 +160,8 @@
         </div>
       <![endif]-->
       
-      <div class="game-container">
-      
+      <div id="game-container">
+        
       </div>
       
       <div class="footnote">
@@ -135,6 +177,18 @@
       </div>
     </script>
     
+    <script id="template-game" type="text/template">
+      <div class="game-container-inner">
+        <!--
+        <input type="text" id="tax-rate" value="5.5" data-slider="true" data-slider-range="0,10" data-slider-step="0.1" data-slider-snap="true" />
+        -->
+        
+        <div id="tax-rate-slider" class="noUiSlider" style="position: relative;"></div>
+        
+        <div class="tax-rate-value number">5.5%</div>
+      </div>
+    </script>
+    
     
     <!-- jQuery that is used on MinnPost site (ensures test environment) -->
     <script type="text/javascript">
@@ -142,12 +196,43 @@
     </script>
     <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/jquery-custom-master-20120606/jquery-1.7.2.custom.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/qtip2-master-20121022/jquerycustom.qtip.min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/underscore-1.4.4/underscore-min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/jquery-no-ui-slider-2.5.5/jquerycustom.nouislider.min.js"></script>
+    
     
     <script type="text/javascript">
       jQueryCustom.noConflict();
     
       (function($, w, undefined) {
+        var dataDir = 'https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/data/';
+        
+        // Check if we are on localhost
+        if (location.host.indexOf('localhost') > -1) {
+          dataDir = './data/';
+        }
+        
         $(document).ready(function() {
+          var templates = {
+            loading: _.template($('#template-loading').html()),
+            game: _.template($('#template-game').html())
+          };
+          var $appContainer = $('#game-container');
+          
+          
+          $appContainer.html(templates.loading({}));
+          $appContainer.html(templates.game({}));
+          
+          // This slider only uses integers.  So multiplying by ten.
+          $('#tax-rate-slider').noUiSlider('init', {
+            handles: 1,
+            connect: 'lower',
+            scale: [0, 100],
+            start: 55,
+            change: function(e) {
+              var val = $(this).noUiSlider('value')[1];
+              $('.tax-rate-value').html((val / 10).toFixed(1) + '%');
+            }
+          });
         
         });
       })(jQueryCustom, window);
