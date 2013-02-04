@@ -4,4 +4,11 @@ A small interactive game to see how which taxes and tax rate combinations will a
 
 ## View
 
-Go to ```./application/index.html``` in a browser.
+Go to ```./index.html``` in a browser.
+
+## Deploy
+
+Since this will be deployed by embedding HTML/CSS/JS directly into the CMS, it is easiest to host AWS.
+
+1. Install Grunt: ```npm install grunt grunt-s3```
+2. Deploy: ```grunt mp-deploy```
