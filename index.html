@@ -198,6 +198,7 @@
     <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/qtip2-master-20121022/jquerycustom.qtip.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/underscore-1.4.4/underscore-min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/jquery-no-ui-slider-2.5.5/jquerycustom.nouislider.min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/data.minnpost/js/tabletop-master-20121204/tabletop.min.js"></script>
     
     
     <script type="text/javascript">
@@ -205,6 +206,7 @@
     
       (function($, w, undefined) {
         var dataDir = 'https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/data/';
+        var spreadsheetID = '0Ata43HM8s_nadFNRa2dKbHZ1QzhleHJPMHNEeHQ2bVE';
         
         // Check if we are on localhost
         if (location.host.indexOf('localhost') > -1) {
@@ -218,22 +220,41 @@
           };
           var $appContainer = $('#game-container');
           
-          
+          // Mark as loading
           $appContainer.html(templates.loading({}));
-          $appContainer.html(templates.game({}));
           
-          // This slider only uses integers.  So multiplying by ten.
-          $('#tax-rate-slider').noUiSlider('init', {
-            handles: 1,
-            connect: 'lower',
-            scale: [0, 100],
-            start: 55,
-            change: function(e) {
-              var val = $(this).noUiSlider('value')[1];
-              $('.tax-rate-value').html((val / 10).toFixed(1) + '%');
+          // Build slider function
+          var buildSlider = function() {
+            // This slider only uses integers.  So multiplying by ten.
+            $('#tax-rate-slider').noUiSlider('init', {
+              handles: 1,
+              connect: 'lower',
+              scale: [0, 100],
+              start: 55,
+              change: function(e) {
+                var val = $(this).noUiSlider('value')[1];
+                $('.tax-rate-value').html((val / 10).toFixed(1) + '%');
+              }
+            });
+          };
+          
+          // Main function once data is loaded
+          var buildGame = function(data, tabletop) {
+            $appContainer.html(templates.game({}));
+            buildSlider();
+            
+            // Do stuff here
+          };
+          
+          // Get data from spreadsheet
+          Tabletop.init({
+            key: spreadsheetID,
+            simpleSheet: true,
+            callback: buildGame,
+            postProcess: function(row) {
+              row.base = parseFloat(row.base);
             }
           });
-        
         });
       })(jQueryCustom, window);
     </script>
