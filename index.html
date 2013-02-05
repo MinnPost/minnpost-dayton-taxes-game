@@ -119,18 +119,21 @@
       }
       
       .tax-options-container .cell-inner {
-        padding: 2% 3%;
+        padding: 1% 1%;
         cursor: pointer;
       }
       
       .tax-options-container .tax-option {
         font-size: .85em;
-        padding: 1% 3%;
-        color: #9E9494;
+        padding: 2% 4%;
+        opacity: 0.5;
+        filter: alpha(opacity = 50);
+        background-color: #D4D4D4;
       }
       
       .tax-options-container .tax-option.enabled {
-        color: #1a1818;
+        opacity: 1;
+        filter: alpha(opacity = 100);
       }
       
       .tax-options-container .more-info {
@@ -143,9 +146,6 @@
         zoom:1;
         *display:inline;
       }
-      .tax-options-container .enabled .more-info {
-        background: transparent url('https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/images/MoreInfoIcon.png') top center no-repeat;
-      }
       
       .game-container-inner .total {
         margin-top: 2em;
@@ -157,10 +157,23 @@
         line-height: 1.25em;
       }
       
+      .game-container-inner .total-dayton-diff {
+        text-align: center;
+        font-size: 1em;
+        margin-top: 1em;
+      }
+      .game-container-inner .total-diff {
+        font-size: 2em;
+        line-height: 1.25em;
+      }
+      
       .more-info-container {
         padding: 3% 5%;
         font-size: 1.25em;
         line-height: 1.25em;
+      }
+      .more-info-container .examples {
+        margin-top: 1em;
       }
       
       /**
@@ -257,6 +270,10 @@
         
         <div class="total">
           <div class="total-raised number"></div>
+          <div class="total-dayton-diff">
+            Difference from Dayton's budget proposal:
+            <div class="total-diff number"></div>
+          </div>
         </div>
       </div>
     </script>
@@ -321,6 +338,7 @@
         var taxData;
         var taxRate = 5.5;
         var currentTotal = 357174500.00;
+        var daytonTotal = 357174500.00;
         
         // Check if we are on localhost
         if (location.host.indexOf('localhost') > -1) {
@@ -341,12 +359,15 @@
           // Calculate total
           var calculateTotal = function() {
             var total = 0;
+            var diff = 0;
             
             _.each(taxData, function(d) {
               total += (d.on) ? d.base * taxRate : 0;
             });
+            diff = total - daytonTotal;
             
             $('.total-raised').html('$' + _.numCommas(total.toFixed(2)));
+            $('.total-diff').html('$' + _.numCommas(diff.toFixed(2)));
           };
           
           // Build slider function
