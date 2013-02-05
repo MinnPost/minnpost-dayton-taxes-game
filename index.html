@@ -82,11 +82,41 @@
         font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
       }
       
+      #minnpost-dayton-taxes-game .positive {
+        color: #24B616;
+      }
+      
+      #minnpost-dayton-taxes-game .negative {
+        color: #B61624;
+      }
+      
+      .tax-rate-container {
+        text-align: center;
+        margin-bottom: 1em;
+      }
+      
       #tax-rate-slider {
         position: relative;
-        width: 50%;
-        margin: 0 auto;
+        width: 40%;
+        display:-moz-inline-stack;
+        display:inline-block;
+        zoom:1;
+        *display:inline;
       }
+      .tax-rate-value-label {
+        margin-right: 1em;
+        font-size: 1.5em;
+        line-height: 2em;
+        text-transform: uppercase;
+        color: #878787;
+      }
+      
+      .tax-rate-value {
+        font-size: 2em;
+        line-height: 2em;
+        margin-left: 1em;
+      }
+      
       #tax-rate-slider .noUi-midBar {
         background: #24B616;
         background: -webkit-linear-gradient(top, #24B616, #24B616);
@@ -98,24 +128,18 @@
         -webkit-border-radius: 3px;
         -moz-border-radius: 3px;
         border-radius: 3px;
-        background-color: #F1E98E;
       }
       #tax-rate-slider .noUi-handle > div:hover,
       #tax-rate-slider .noUi-handle > div.noUi-activeHandle {
-        border: 1px solid #B65916;
-        background-color: #F1E98E;
+        border: 1px solid #B2B2B2;
+        background-color: #D4D4D4;
+        cursor: pointer;
       }
       
       #tax-rate-slider .noUi-handle > div {
         -webkit-border-radius: 3px;
         -moz-border-radius: 3px;
         border-radius: 3px;
-      }
-      
-      .tax-rate-value {
-        font-size: 2em;
-        text-align: center;
-        line-height: 2em;
       }
       
       .tax-options-container .cell-inner {
@@ -126,9 +150,19 @@
       .tax-options-container .tax-option {
         font-size: .85em;
         padding: 2% 4%;
-        opacity: 0.5;
-        filter: alpha(opacity = 50);
+        opacity: 0.6;
+        filter: alpha(opacity = 60);
         background-color: #D4D4D4;
+      }
+      
+      .tax-options-container .tax-option.category-digital {
+        background-color: #80C1EF;
+      }
+      .tax-options-container .tax-option.category-consumer {
+        background-color: #8089EF;
+      }
+      .tax-options-container .tax-option.category-business {
+        background-color: #AE80EF;
       }
       
       .tax-options-container .tax-option.enabled {
@@ -237,9 +271,11 @@
     
     <script id="template-game" type="text/template">
       <div class="game-container-inner">
-        <div id="tax-rate-slider" class="noUiSlider"></div>
-        
-        <div class="tax-rate-value number">5.5%</div>
+        <div class="tax-rate-container">
+          <span class="tax-rate-value-label">Tax rate:</span>
+          <div id="tax-rate-slider" class="noUiSlider"></div>
+          <span class="tax-rate-value number">5.5%</span>
+        </div>
         
         <div class="tax-options-container flurid">
           <% var count = 1; for (var t in taxes) { %>
@@ -360,14 +396,30 @@
           var calculateTotal = function() {
             var total = 0;
             var diff = 0;
+            var $diff = $('.total-diff');
+            var diffPrefix = '$';
             
             _.each(taxData, function(d) {
               total += (d.on) ? d.base * taxRate : 0;
             });
             diff = total - daytonTotal;
             
+            // Show total
             $('.total-raised').html('$' + _.numCommas(total.toFixed(2)));
-            $('.total-diff').html('$' + _.numCommas(diff.toFixed(2)));
+
+            // Show diff
+            if (diff.toFixed(2) == 0) {
+              $diff.removeClass('positive').removeClass('negative');
+            }
+            else if (diff < 0) {
+              $diff.removeClass('positive').addClass('negative');
+              diffPrefix = '-$';
+            }
+            else {
+              $diff.addClass('positive').removeClass('negative');
+              diffPrefix = '+$';
+            }
+            $('.total-diff').html(diffPrefix + _.numCommas(Math.abs(diff).toFixed(2)));
           };
           
           // Build slider function
@@ -426,7 +478,7 @@
           
           // Main function once data is loaded
           var buildGame = function(data, tabletop) {
-            taxData = data;
+            taxData = _.sortBy(data, function(d) { return d.category; });;
             
             $appContainer.html(templates.game({ taxes: taxData }));
             buildSlider();
