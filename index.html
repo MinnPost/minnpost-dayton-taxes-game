@@ -118,6 +118,30 @@
         line-height: 2em;
       }
       
+      .tax-options-container .cell-inner {
+        padding: 2% 3%;
+        cursor: pointer;
+      }
+      
+      .tax-options-container .tax-option {
+        padding: 2% 5%;
+        border: 1px solid #CECECE;
+      }
+      
+      .tax-options-container .tax-option.enabled {
+        border: 1px solid #222222;
+      }
+      
+      .total {
+        margin-top: 2em;
+      }
+      
+      .total .total-raised {
+        text-align: center;
+        font-size: 3em;
+        line-height: 1.25em;
+      }
+      
       /**
        * Responsive creen size styles
        */
@@ -179,13 +203,35 @@
     
     <script id="template-game" type="text/template">
       <div class="game-container-inner">
-        <!--
-        <input type="text" id="tax-rate" value="5.5" data-slider="true" data-slider-range="0,10" data-slider-step="0.1" data-slider-snap="true" />
-        -->
-        
-        <div id="tax-rate-slider" class="noUiSlider" style="position: relative;"></div>
+        <div id="tax-rate-slider" class="noUiSlider"></div>
         
         <div class="tax-rate-value number">5.5%</div>
+        
+        <div class="tax-options-container flurid">
+          <% var count = 1; for (var t in taxes) { %>
+            <% if (count % 4 === 0) { %>
+              <div class="row">
+            <% } %>
+            
+            <div class="column width_1/4 <% if (count % 4 === 4) { %>last<% } %>">
+              <div class="cell-inner">
+                <div class="tax-option category-<%= taxes[t].category.toLowerCase() %> <% if (taxes[t].on) { %>enabled<% } %>" data-id="<%= taxes[t].id %>">
+                  <%= taxes[t].title %> <br />
+                  <span class="number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
+                </div>
+              </div>
+            </div>
+            
+            <% if (count % 4 === 0) { %>
+              </div>
+            <% } %>
+            <% count++; %>
+          <% } %>
+        </div>
+        
+        <div class="total">
+          <div class="total-raised number"></div>
+        </div>
       </div>
     </script>
     
@@ -203,10 +249,34 @@
     
     <script type="text/javascript">
       jQueryCustom.noConflict();
+      
+      // Add some utility functions to underscore
+      _.mixin({
+        numCommas: function(number) {
+          number += '';
+          var x = number.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        },
+        boolString: function(bool) {
+          return (bool) ? 'true' : 'false';
+        },
+        stringBool: function(string) {
+          return (string && string !== 'false') ? true : false;
+        }
+      });
     
       (function($, w, undefined) {
         var dataDir = 'https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/data/';
         var spreadsheetID = '0Ata43HM8s_nadFNRa2dKbHZ1QzhleHJPMHNEeHQ2bVE';
+        var idCounter = 1;
+        var taxData;
+        var taxRate = 5.5;
         
         // Check if we are on localhost
         if (location.host.indexOf('localhost') > -1) {
@@ -223,6 +293,17 @@
           // Mark as loading
           $appContainer.html(templates.loading({}));
           
+          // Calculate total
+          var calculateTotal = function() {
+            var total = 0;
+            
+            _.each(taxData, function(d) {
+              total += (d.on) ? d.base * taxRate : 0;
+            });
+            
+            $('.total-raised').html('$' + _.numCommas(total.toFixed(2)));
+          };
+          
           // Build slider function
           var buildSlider = function() {
             // This slider only uses integers.  So multiplying by ten.
@@ -233,17 +314,39 @@
               start: 55,
               change: function(e) {
                 var val = $(this).noUiSlider('value')[1];
-                $('.tax-rate-value').html((val / 10).toFixed(1) + '%');
+                taxRate = (val / 10).toFixed(1);
+                $('.tax-rate-value').html(taxRate + '%');
+                calculateTotal();
               }
+            });
+          };
+          
+          // Handle events
+          var handleEvents = function() {
+            $('.tax-option').on('click', function(e) {
+              e.preventDefault();
+              var $this = $(this);
+              var id = $this.attr('data-id');
+              var taxOption = _.find(taxData, function(d) {
+                return (d.id == id);
+              });
+              
+              // Handle enabled
+              $this.toggleClass('enabled');
+              taxOption.on = (taxOption.on) ? false : true;
+              
+              calculateTotal();
             });
           };
           
           // Main function once data is loaded
           var buildGame = function(data, tabletop) {
-            $appContainer.html(templates.game({}));
-            buildSlider();
+            taxData = data;
             
-            // Do stuff here
+            $appContainer.html(templates.game({ taxes: taxData }));
+            buildSlider();
+            handleEvents();
+            calculateTotal();
           };
           
           // Get data from spreadsheet
@@ -253,6 +356,10 @@
             callback: buildGame,
             postProcess: function(row) {
               row.base = parseFloat(row.base);
+              row.id = idCounter;
+              row.on = true;
+              
+              idCounter++;
             }
           });
         });
