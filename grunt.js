@@ -14,6 +14,10 @@ module.exports = function(grunt) {
       access: 'public-read',
       upload: [
         {
+          src: 'images/*',
+          dest: 'projects/minnpost-dayton-taxes-game/images/'
+        },
+        {
           src: 'data/*',
           dest: 'projects/minnpost-dayton-taxes-game/data/'
         }

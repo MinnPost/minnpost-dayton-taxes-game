@@ -124,21 +124,42 @@
       }
       
       .tax-options-container .tax-option {
-        padding: 2% 5%;
-        border: 1px solid #CECECE;
+        font-size: .85em;
+        padding: 1% 3%;
+        color: #9E9494;
       }
       
       .tax-options-container .tax-option.enabled {
-        border: 1px solid #222222;
+        color: #1a1818;
       }
       
-      .total {
+      .tax-options-container .more-info {
+        width: 15px;
+        height: 15px;
+        margin-left: 5px;
+        background: transparent url('https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/images/MoreInfoIcon-light.png') top center no-repeat;
+        display:-moz-inline-stack;
+        display:inline-block;
+        zoom:1;
+        *display:inline;
+      }
+      .tax-options-container .enabled .more-info {
+        background: transparent url('https://s3.amazonaws.com/data.minnpost/projects/minnpost-dayton-taxes-game/images/MoreInfoIcon.png') top center no-repeat;
+      }
+      
+      .game-container-inner .total {
         margin-top: 2em;
       }
       
-      .total .total-raised {
+      .game-container-inner .total .total-raised {
         text-align: center;
         font-size: 3em;
+        line-height: 1.25em;
+      }
+      
+      .more-info-container {
+        padding: 3% 5%;
+        font-size: 1.25em;
         line-height: 1.25em;
       }
       
@@ -216,7 +237,12 @@
             <div class="column width_1/4 <% if (count % 4 === 4) { %>last<% } %>">
               <div class="cell-inner">
                 <div class="tax-option category-<%= taxes[t].category.toLowerCase() %> <% if (taxes[t].on) { %>enabled<% } %>" data-id="<%= taxes[t].id %>">
-                  <%= taxes[t].title %> <br />
+                  <span class="tax-title"><%= taxes[t].title %></span>
+                  <% if (taxes[t].details || taxes[t].examples) { %>
+                    <span class="more-info"  data-id="<%= taxes[t].id %>"></span>
+                  <% } %>
+                  
+                  <br />
                   <span class="number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
                 </div>
               </div>
@@ -232,6 +258,23 @@
         <div class="total">
           <div class="total-raised number"></div>
         </div>
+      </div>
+    </script>
+    
+    <script id="template-more-info" type="text/template">
+      <div class="more-info-container">
+        <% if (t.details) { %>
+          <div class="details">
+            <%= t.details %>
+          </div>
+        <% } %>
+        
+        <% if (t.examples) { %>
+          <div class="examples">
+            <h5>Examples</h5>
+            <%= t.examples %>
+          </div>
+        <% } %>
       </div>
     </script>
     
@@ -277,6 +320,7 @@
         var idCounter = 1;
         var taxData;
         var taxRate = 5.5;
+        var currentTotal = 357174500.00;
         
         // Check if we are on localhost
         if (location.host.indexOf('localhost') > -1) {
@@ -286,7 +330,8 @@
         $(document).ready(function() {
           var templates = {
             loading: _.template($('#template-loading').html()),
-            game: _.template($('#template-game').html())
+            game: _.template($('#template-game').html()),
+            moreInfo: _.template($('#template-more-info').html())
           };
           var $appContainer = $('#game-container');
           
@@ -311,7 +356,7 @@
               handles: 1,
               connect: 'lower',
               scale: [0, 100],
-              start: 55,
+              start: taxRate * 10,
               change: function(e) {
                 var val = $(this).noUiSlider('value')[1];
                 taxRate = (val / 10).toFixed(1);
@@ -336,6 +381,25 @@
               taxOption.on = (taxOption.on) ? false : true;
               
               calculateTotal();
+            });
+            
+            // More info events with qtip
+            $('.more-info').qtip({
+              content: function(e) {
+                var id = $(this).attr('data-id');
+                var taxOption = _.find(taxData, function(d) {
+                  return (d.id == id);
+                });
+                
+                return templates.moreInfo({ t: taxOption });
+              },
+              style: {
+                classes: 'ui-tooltip-shadow ui-tooltip-light'
+              },
+              position: {
+                at: 'bottom center',
+                my: 'top center'
+              }
             });
           };
           
