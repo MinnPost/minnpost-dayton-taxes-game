@@ -373,8 +373,8 @@
         var idCounter = 1;
         var taxData;
         var taxRate = 5.5;
-        var currentTotal = 357174500.00;
-        var daytonTotal = 357174500.00;
+        var currentTotal = 952654499.95;
+        var daytonTotal = 952654499.95;
         
         // Check if we are on localhost
         if (location.host.indexOf('localhost') > -1) {
@@ -420,6 +420,8 @@
               diffPrefix = '+$';
             }
             $('.total-diff').html(diffPrefix + _.numCommas(Math.abs(diff).toFixed(2)));
+            
+            return total;
           };
           
           // Build slider function
@@ -478,11 +480,14 @@
           
           // Main function once data is loaded
           var buildGame = function(data, tabletop) {
-            taxData = _.sortBy(data, function(d) { return d.category; });;
+            taxData = _.sortBy(data, function(d) { return d.category + d.title; });;
             
             $appContainer.html(templates.game({ taxes: taxData }));
             buildSlider();
             handleEvents();
+            
+            // Get total and store, then use that to find diff
+            daytonTotal = calculateTotal();
             calculateTotal();
           };
           
