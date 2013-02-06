@@ -142,6 +142,14 @@
         border-radius: 3px;
       }
       
+      .tax-options-selection-container {
+        text-align: center;
+        margin-bottom: 1em;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: #878787;
+      }
+      
       .tax-options-container .cell-inner {
         padding: 1% 1%;
         cursor: pointer;
@@ -275,6 +283,11 @@
           <span class="tax-rate-value-label">Tax rate:</span>
           <div id="tax-rate-slider" class="noUiSlider"></div>
           <span class="tax-rate-value number">5.5%</span>
+        </div>
+        
+        <div class="tax-options-selection-container">
+          <a href="#" class="tax-option-select-all">Select all</a> | 
+          <a href="#" class="tax-option-select-none">Select none</a>
         </div>
         
         <div class="tax-options-container flurid">
@@ -475,6 +488,28 @@
                 at: 'bottom center',
                 my: 'top center'
               }
+            });
+            
+            // Select all or none links
+            $('.tax-option-select-all').on('click', function(e) {
+              e.preventDefault();
+              
+              _.each(taxData, function(d) {
+                $('.tax-option[data-id=' + d.id + ']').addClass('enabled');
+                d.on = true;
+              });
+              calculateTotal();
+            });
+            
+            // Select all or none links
+            $('.tax-option-select-none').on('click', function(e) {
+              e.preventDefault();
+              
+              _.each(taxData, function(d) {
+                $('.tax-option[data-id=' + d.id + ']').removeClass('enabled');
+                d.on = false;
+              });
+              calculateTotal();
             });
           };
           
