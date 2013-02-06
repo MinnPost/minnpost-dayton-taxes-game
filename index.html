@@ -150,6 +150,9 @@
         color: #878787;
       }
       
+      .tax-options-selection-container a {
+      }
+      
       .tax-options-container .cell-inner {
         padding: 1% 1%;
         cursor: pointer;
@@ -305,7 +308,7 @@
                   <% } %>
                   
                   <br />
-                  <span class="number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
+                  <span class="tax-option-amount number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
                 </div>
               </div>
             </div>
@@ -371,6 +374,9 @@
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
           }
           return x1 + x2;
+        },
+        numCurrency: function(number) {
+          return '$' + this.numCommas(number.toFixed(2));
         },
         boolString: function(bool) {
           return (bool) ? 'true' : 'false';
@@ -443,12 +449,21 @@
             $('#tax-rate-slider').noUiSlider('init', {
               handles: 1,
               connect: 'lower',
-              scale: [0, 100],
+              scale: [0, 150],
               start: taxRate * 10,
               change: function(e) {
+                // Determine tx rate
                 var val = $(this).noUiSlider('value')[1];
                 taxRate = (val / 10).toFixed(1);
                 $('.tax-rate-value').html(taxRate + '%');
+                
+                // Upodate tax amounts for each item
+                _.each(taxData, function(d) {
+                  $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrency(d.base * taxRate));
+                  d.on = true;
+                });
+                
+                // Calculate total
                 calculateTotal();
               }
             });
