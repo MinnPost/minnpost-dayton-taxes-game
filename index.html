@@ -335,34 +335,12 @@
         
         <div class="tax-options-selection-container">
           <a href="#" class="tax-option-select-all">Select all</a> | 
-          <a href="#" class="tax-option-select-none">Select none</a>
+          <a href="#" class="tax-option-select-none">Select none</a> | 
+          <a href="#" class="tax-option-sort-amount">Sort by amount</a> | 
+          <a href="#" class="tax-option-sort-title">Sort by title</a>
         </div>
         
-        <div class="tax-options-container flurid">
-          <% var count = 1; for (var t in taxes) { %>
-            <% if (count % 4 === 0) { %>
-              <div class="row">
-            <% } %>
-            
-            <div class="column width_1/4 <% if (count % 4 === 4) { %>last<% } %>">
-              <div class="cell-inner">
-                <div class="tax-option category-<%= taxes[t].category.toLowerCase() %> <% if (taxes[t].on) { %>enabled<% } %>" data-id="<%= taxes[t].id %>">
-                  <span class="tax-title"><%= taxes[t].title %></span>
-                  <% if (taxes[t].details || taxes[t].examples) { %>
-                    <span class="more-info"  data-id="<%= taxes[t].id %>"></span>
-                  <% } %>
-                  
-                  <br />
-                  <span class="tax-option-amount number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
-                </div>
-              </div>
-            </div>
-            
-            <% if (count % 4 === 0) { %>
-              </div>
-            <% } %>
-            <% count++; %>
-          <% } %>
+        <div class="tax-options-container">
         </div>
         
         <div class="total-container">
@@ -377,6 +355,35 @@
             </div>
           </div>
         </div>
+      </div>
+    </script>
+    
+    <script id="template-tax-options" type="text/template">
+      <div class="flurid">
+        <% var count = 1; for (var t in taxes) { %>
+          <% if (count % 4 === 0) { %>
+            <div class="row">
+          <% } %>
+          
+          <div class="column width_1/4 <% if (count % 4 === 4) { %>last<% } %>">
+            <div class="cell-inner">
+              <div class="tax-option category-<%= taxes[t].category.toLowerCase() %> <% if (taxes[t].on) { %>enabled<% } %>" data-id="<%= taxes[t].id %>">
+                <span class="tax-title"><%= taxes[t].title %></span>
+                <% if (taxes[t].details || taxes[t].examples) { %>
+                  <span class="more-info"  data-id="<%= taxes[t].id %>"></span>
+                <% } %>
+                
+                <br />
+                <span class="tax-option-amount number">$<%= _.numCommas(taxes[t].base.toFixed(2)) %></span>
+              </div>
+            </div>
+          </div>
+          
+          <% if (count % 4 === 0) { %>
+            </div>
+          <% } %>
+          <% count++; %>
+        <% } %>
       </div>
     </script>
     
@@ -463,6 +470,7 @@
           var templates = {
             loading: _.template($('#template-loading').html()),
             game: _.template($('#template-game').html()),
+            taxOptions: _.template($('#template-tax-options').html()),
             moreInfo: _.template($('#template-more-info').html())
           };
           var $appContainer = $('#game-container');
@@ -539,7 +547,7 @@
           
           // Handle events
           var handleEvents = function() {
-            $('.tax-option').on('click', function(e) {
+            $('#game-container').on('click', '.tax-option', function(e) {
               e.preventDefault();
               var $this = $(this);
               var id = $this.attr('data-id');
@@ -607,6 +615,26 @@
               calculateTotal();
             });
             
+            // Sort by amount
+            $('.tax-option-sort-amount').on('click', function(e) {
+              e.preventDefault();
+              
+              taxData = _.sortBy(taxData, function(d) { return d.base * -1; });
+              $('.tax-options-container').html(templates.taxOptions({ taxes: taxData }));
+              updateTaxRates();
+              calculateTotal();
+            });
+            
+            // Sort by title
+            $('.tax-option-sort-title').on('click', function(e) {
+              e.preventDefault();
+              
+              taxData = _.sortBy(taxData, function(d) { return d.title; });
+              $('.tax-options-container').html(templates.taxOptions({ taxes: taxData }));
+              updateTaxRates();
+              calculateTotal();
+            });
+            
             // Fixed total thingy
             var $total = $('.total');
             var totalB = $total.offset().top + $total.outerHeight();
@@ -629,9 +657,10 @@
           
           // Main function once data is loaded
           var buildGame = function(data, tabletop) {
-            taxData = _.sortBy(data, function(d) { return d.base * -1; });;
+            taxData = _.sortBy(data, function(d) { return d.base * -1; });
             
-            $appContainer.html(templates.game({ taxes: taxData }));
+            $appContainer.html(templates.game({ }));
+            $('.tax-options-container').html(templates.taxOptions({ taxes: taxData }));
             buildSlider();
             
             // Get total and store, then use that to find diff
