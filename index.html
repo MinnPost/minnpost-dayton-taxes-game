@@ -486,7 +486,6 @@
                 // Upodate tax amounts for each item
                 _.each(taxData, function(d) {
                   $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrency(d.base * taxRate));
-                  d.on = true;
                 });
                 
                 // Calculate total
@@ -535,9 +534,10 @@
             $('.tax-option-select-all').on('click', function(e) {
               e.preventDefault();
               
-              _.each(taxData, function(d) {
+              taxData = _.map(taxData, function(d) {
                 $('.tax-option[data-id=' + d.id + ']').addClass('enabled');
                 d.on = true;
+                return d;
               });
               calculateTotal();
             });
@@ -546,9 +546,10 @@
             $('.tax-option-select-none').on('click', function(e) {
               e.preventDefault();
               
-              _.each(taxData, function(d) {
+              taxData = _.map(taxData, function(d) {
                 $('.tax-option[data-id=' + d.id + ']').removeClass('enabled');
                 d.on = false;
+                return d;
               });
               calculateTotal();
             });
@@ -569,6 +570,8 @@
                 $total.removeClass('glued');
               }
             });
+            // Initial trigger
+            $(w).scroll();
           };
           
           // Main function once data is loaded
