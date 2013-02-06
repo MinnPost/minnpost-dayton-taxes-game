@@ -194,19 +194,31 @@
       
       .game-container-inner .total {
         margin-top: 2em;
+        text-align: center;
       }
       
       .game-container-inner .total .total-raised {
-        text-align: center;
         font-size: 3em;
         line-height: 1.25em;
+        display:-moz-inline-stack;
+        display:inline-block;
+        zoom:1;
+        *display:inline;
       }
       
       .game-container-inner .total-dayton-diff {
-        text-align: center;
         font-size: 1em;
-        margin-top: 1em;
+        margin-left: 2em;
+        display:-moz-inline-stack;
+        display:inline-block;
+        zoom:1;
+        *display:inline;
       }
+      
+      .game-container-inner .total-diff-label {
+        color: #878787;
+      }
+      
       .game-container-inner .total-diff {
         font-size: 2em;
         line-height: 1.25em;
@@ -217,6 +229,7 @@
         font-size: 1.25em;
         line-height: 1.25em;
       }
+      
       .more-info-container .examples {
         margin-top: 1em;
       }
@@ -323,7 +336,7 @@
         <div class="total">
           <div class="total-raised number"></div>
           <div class="total-dayton-diff">
-            Difference from Dayton's budget proposal:
+            <div class="total-diff-label">Difference from Dayton's budget proposal:</div>
             <div class="total-diff number"></div>
           </div>
         </div>
