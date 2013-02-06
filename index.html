@@ -95,26 +95,42 @@
         margin-bottom: 1em;
       }
       
-      #tax-rate-slider {
-        position: relative;
-        width: 40%;
+      .tax-rate-value-label-container,
+      .slider-container,
+      .tax-rate-value {
         display:-moz-inline-stack;
         display:inline-block;
         zoom:1;
         *display:inline;
       }
-      .tax-rate-value-label {
+      
+      .slider-container {
+        width: 40%;
+      }
+      #tax-rate-slider {
+        position: relative;
+        width: 99%;
+        margin-bottom: 1.5em;
+      }
+      
+      .tax-rate-value-label-container {
         margin-right: 1em;
+      }
+      
+      .tax-rate-value-label {
         font-size: 1.5em;
-        line-height: 2em;
+        line-height: 1.25em;
         text-transform: uppercase;
         color: #878787;
       }
       
       .tax-rate-value {
         font-size: 2em;
-        line-height: 2em;
         margin-left: 1em;
+        text-align: left;
+        width: 4em;
+        top: -.5em;
+        position: relative;
       }
       
       #tax-rate-slider .noUi-midBar {
@@ -307,9 +323,14 @@
     <script id="template-game" type="text/template">
       <div class="game-container-inner">
         <div class="tax-rate-container">
-          <span class="tax-rate-value-label">Tax rate:</span>
-          <div id="tax-rate-slider" class="noUiSlider"></div>
-          <span class="tax-rate-value number">5.5%</span>
+          <div class="tax-rate-value-label-container">
+            <div class="tax-rate-value-label">Tax rate:</div>
+            <div><a href="#" class="tax-rate-current">Set to current rate</a></div>
+          </div>
+          <div class="slider-container">
+            <div id="tax-rate-slider" class="noUiSlider"></div>
+          </div>
+          <div class="tax-rate-value number">5.5%</div>
         </div>
         
         <div class="tax-options-selection-container">
@@ -498,11 +519,11 @@
               scale: [0, 150],
               start: taxRate * 10,
               change: function(e) {
-                // Determine tx rate
                 var val = $(this).noUiSlider('value')[1];
                 taxRate = (val / 10).toFixed(1);
                 $('.tax-rate-value').html(taxRate + '%');
-                
+              },
+              end: function(e) {
                 // Update tax amounts for each item and calculate total.
                 updateTaxRates();
                 calculateTotal();
@@ -524,6 +545,16 @@
               $this.toggleClass('enabled');
               taxOption.on = (taxOption.on) ? false : true;
               
+              calculateTotal();
+            });
+            
+            $('.tax-rate-current').on('click', function(e) {
+              e.preventDefault();
+              // Stupid slider only handles integers
+              $('#tax-rate-slider').noUiSlider('move', { knob: 0, to: 68.75 });
+              taxRate = 6.875;
+              $('.tax-rate-value').html(taxRate + '%');
+              updateTaxRates();
               calculateTotal();
             });
             
