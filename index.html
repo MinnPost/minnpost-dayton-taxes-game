@@ -213,31 +213,23 @@
         box-shadow: 0px 0px 3px 3px rgba(100, 100, 100, 0.4);
       }
       
-      .game-container-inner .total .total-raised {
-        font-size: 3em;
-        line-height: 1.25em;
+      .game-container-inner .total .total-raised-container,
+      .game-container-inner .total .total-diff-container {
+        margin: 0 1em;
         display:-moz-inline-stack;
         display:inline-block;
         zoom:1;
         *display:inline;
       }
       
-      .game-container-inner .total-dayton-diff {
-        font-size: 1em;
-        margin-left: 2em;
-        display:-moz-inline-stack;
-        display:inline-block;
-        zoom:1;
-        *display:inline;
+      .game-container-inner .total .total-raised,
+      .game-container-inner .total .total-diff {
+        font-size: 2em;
+        line-height: 1.25em;
       }
       
       .game-container-inner .total-diff-label {
         color: #878787;
-      }
-      
-      .game-container-inner .total-diff {
-        font-size: 2em;
-        line-height: 1.25em;
       }
       
       .more-info-container {
@@ -351,8 +343,11 @@
         
         <div class="total-container">
           <div class="total">
-            <div class="total-raised number"></div>
-            <div class="total-dayton-diff">
+            <div class="total-raised-container">
+              <div class="total-diff-label">Total raised:</div>
+              <div class="total-raised number"></div>
+            </div>
+            <div class="total-diff-container">
               <div class="total-diff-label">Difference from Dayton's budget proposal:</div>
               <div class="total-diff number"></div>
             </div>
