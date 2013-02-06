@@ -166,6 +166,7 @@
         background-color: #D4D4D4;
       }
       
+      /*
       .tax-options-container .tax-option.category-digital {
         background-color: #80C1EF;
       }
@@ -175,6 +176,7 @@
       .tax-options-container .tax-option.category-business {
         background-color: #AE80EF;
       }
+      */
       
       .tax-options-container .tax-option.enabled {
         opacity: 1;
@@ -470,6 +472,13 @@
           };
           
           // Build slider function
+          var updateTaxRates = function() {
+            _.each(taxData, function(d) {
+              $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrency(d.base * taxRate));
+            });
+          };
+          
+          // Build slider function
           var buildSlider = function() {
             // This slider only uses integers.  So multiplying by ten.
             $('#tax-rate-slider').noUiSlider('init', {
@@ -483,12 +492,8 @@
                 taxRate = (val / 10).toFixed(1);
                 $('.tax-rate-value').html(taxRate + '%');
                 
-                // Upodate tax amounts for each item
-                _.each(taxData, function(d) {
-                  $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrency(d.base * taxRate));
-                });
-                
-                // Calculate total
+                // Update tax amounts for each item and calculate total.
+                updateTaxRates();
                 calculateTotal();
               }
             });
@@ -584,6 +589,7 @@
             // Get total and store, then use that to find diff
             daytonTotal = calculateTotal();
             calculateTotal();
+            updateTaxRates();
             
             handleEvents();
           };
