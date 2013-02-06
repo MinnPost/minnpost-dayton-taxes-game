@@ -308,7 +308,7 @@
       </div>
       
       <div class="footnote">
-        <p>Data compiled from the <a href="http://www.revenue.state.mn.us/tax_reform/Documents/Sales%20Tax%20Reform%20Overview%2001.29.2013.pdf" target="_blank">Minnesota Department of Revenue</a>.  Code, techniques, and data on <a href="https://github.com/MinnPost/minnpost-dayton-taxes-game" target="_blank">Github</a>.</p>
+        <p>Total dollar amounts are rounded to nearest thousandths.  Data compiled from the <a href="http://www.revenue.state.mn.us/tax_reform/Documents/Sales%20Tax%20Reform%20Overview%2001.29.2013.pdf" target="_blank">Minnesota Department of Revenue</a>.  Code, techniques, and data on <a href="https://github.com/MinnPost/minnpost-dayton-taxes-game" target="_blank">Github</a>.</p>
       </div>
     </div>
     
@@ -450,7 +450,7 @@
         var spreadsheetID = '0Ata43HM8s_nadFNRa2dKbHZ1QzhleHJPMHNEeHQ2bVE';
         var idCounter = 1;
         var taxData;
-        var taxRate = 5.5;
+        var taxRate = 0.055;
         var currentTotal = 952654499.95;
         var daytonTotal = 952654499.95;
         
@@ -510,6 +510,12 @@
             });
           };
           
+          // Display tax rate
+          var displayTaxRate = function(fix) {
+            fix = fix || 1;
+            $('.tax-rate-value').html((taxRate * 100).toFixed(fix) + '%');
+          };
+          
           // Build slider function
           var buildSlider = function() {
             // This slider only uses integers.  So multiplying by ten.
@@ -517,11 +523,11 @@
               handles: 1,
               connect: 'lower',
               scale: [0, 150],
-              start: taxRate * 10,
+              start: taxRate * 1000,
               change: function(e) {
                 var val = $(this).noUiSlider('value')[1];
-                taxRate = (val / 10).toFixed(1);
-                $('.tax-rate-value').html(taxRate + '%');
+                taxRate = (val / 1000);
+                displayTaxRate();
               },
               end: function(e) {
                 // Update tax amounts for each item and calculate total.
@@ -552,8 +558,8 @@
               e.preventDefault();
               // Stupid slider only handles integers
               $('#tax-rate-slider').noUiSlider('move', { knob: 0, to: 68.75 });
-              taxRate = 6.875;
-              $('.tax-rate-value').html(taxRate + '%');
+              taxRate = 0.06875;
+              displayTaxRate(3);
               updateTaxRates();
               calculateTotal();
             });
