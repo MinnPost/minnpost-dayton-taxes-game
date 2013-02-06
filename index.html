@@ -83,11 +83,11 @@
       }
       
       #minnpost-dayton-taxes-game .positive {
-        color: #24B616;
+        color: #5CA36F;
       }
       
       #minnpost-dayton-taxes-game .negative {
-        color: #B61624;
+        color: #B01C2A;
       }
       
       .tax-rate-container {
@@ -134,11 +134,11 @@
       }
       
       #tax-rate-slider .noUi-midBar {
-        background: #6CEB60;
-        background: -webkit-linear-gradient(top, #6CEB60, #24B616);
-        background: -moz-linear-gradient(top, #6CEB60, #24B616);
-        background: linear-gradient(top, #6CEB60, #24B616);
-        border: 1px solid #24B616;
+        background: #5CA36F;
+        background: -webkit-linear-gradient(top, #5CA36F, #6CAC7D);
+        background: -moz-linear-gradient(top, #5CA36F, #6CAC7D);
+        background: linear-gradient(top, #5CA36F, #6CAC7D);
+        border: 1px solid #5CA36F;
       }
       #tax-rate-slider .noUi-handle > div {
         -webkit-border-radius: 3px;
@@ -224,9 +224,9 @@
         bottom: 0;
         left: 0;
         right: 0;
-        border-top: 1px solid #878787;
-        background-color: #EFEFEF;
-        background-color: rgba(222, 222, 222, 0.9);
+        border-top: 1px solid #C2C2C2;
+        background-color: #F2F2F2;
+        background-color: rgba(255, 255, 255, 0.85);
         -webkit-box-shadow: 0px 0px 3px 3px rgba(100, 100, 100, 0.4);
         -moz-box-shadow: 0px 0px 3px 3px rgba(100, 100, 100, 0.4);
         box-shadow: 0px 0px 3px 3px rgba(100, 100, 100, 0.4);
@@ -308,7 +308,7 @@
       </div>
       
       <div class="footnote">
-        <p>Total dollar amounts are rounded to nearest thousandths.  Data compiled from the <a href="http://www.revenue.state.mn.us/tax_reform/Documents/Sales%20Tax%20Reform%20Overview%2001.29.2013.pdf" target="_blank">Minnesota Department of Revenue</a>.  Code, techniques, and data on <a href="https://github.com/MinnPost/minnpost-dayton-taxes-game" target="_blank">Github</a>.</p>
+        <p>Total dollar amounts are rounded to nearest thousands.  Data compiled from the <a href="http://www.revenue.state.mn.us/tax_reform/Documents/Sales%20Tax%20Reform%20Overview%2001.29.2013.pdf" target="_blank">Minnesota Department of Revenue</a>.  Code, techniques, and data on <a href="https://github.com/MinnPost/minnpost-dayton-taxes-game" target="_blank">Github</a>.</p>
       </div>
     </div>
     
@@ -629,7 +629,7 @@
           
           // Main function once data is loaded
           var buildGame = function(data, tabletop) {
-            taxData = _.sortBy(data, function(d) { return d.category + d.title; });;
+            taxData = _.sortBy(data, function(d) { return d.base * -1; });;
             
             $appContainer.html(templates.game({ taxes: taxData }));
             buildSlider();
