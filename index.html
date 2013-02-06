@@ -194,7 +194,18 @@
       
       .game-container-inner .total {
         margin-top: 2em;
+        padding: .5em 0;
         text-align: center;
+      }
+      
+      .game-container-inner .total.glued {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #878787;
+        background-color: #EFEFEF;
+        background-color: rgba(222, 222, 222, 0.9);
       }
       
       .game-container-inner .total .total-raised {
@@ -333,11 +344,13 @@
           <% } %>
         </div>
         
-        <div class="total">
-          <div class="total-raised number"></div>
-          <div class="total-dayton-diff">
-            <div class="total-diff-label">Difference from Dayton's budget proposal:</div>
-            <div class="total-diff number"></div>
+        <div class="total-container">
+          <div class="total">
+            <div class="total-raised number"></div>
+            <div class="total-dayton-diff">
+              <div class="total-diff-label">Difference from Dayton's budget proposal:</div>
+              <div class="total-diff number"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -539,6 +552,23 @@
               });
               calculateTotal();
             });
+            
+            // Fixed total thingy
+            var $total = $('.total');
+            var totalB = $total.offset().top + $total.outerHeight();
+            $('.total-container').height($total.outerHeight());
+            $(w).scroll(function() {
+              var $this = $(this);
+              var bottom = $this.scrollTop() + $this.height();
+              
+              // Add class for fixed menu
+              if ((bottom < totalB) && !$total.hasClass('glued')) {
+                $total.addClass('glued');
+              }
+              else if ((bottom >= totalB) && $total.hasClass('glued')) {
+                $total.removeClass('glued');
+              }
+            });
           };
           
           // Main function once data is loaded
@@ -547,11 +577,12 @@
             
             $appContainer.html(templates.game({ taxes: taxData }));
             buildSlider();
-            handleEvents();
             
             // Get total and store, then use that to find diff
             daytonTotal = calculateTotal();
             calculateTotal();
+            
+            handleEvents();
           };
           
           // Get data from spreadsheet
