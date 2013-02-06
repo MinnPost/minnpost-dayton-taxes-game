@@ -401,8 +401,17 @@
           }
           return x1 + x2;
         },
+        roundThousand: function(number) {
+          return Math.round(number / 1000) * 1000;
+        },
         numCurrency: function(number) {
           return '$' + this.numCommas(number.toFixed(2));
+        },
+        numCurrencyThousand: function(number, type) {
+          var prefix = '$';
+          prefix = (type === 'positive') ? '+$' : (type === 'negative') ? '-$' : prefix;
+          
+          return prefix + this.numCommas(this.roundThousand(Math.abs(number)));
         },
         boolString: function(bool) {
           return (bool) ? 'true' : 'false';
@@ -442,15 +451,16 @@
             var total = 0;
             var diff = 0;
             var $diff = $('.total-diff');
-            var diffPrefix = '$';
+            var type = null;
             
             _.each(taxData, function(d) {
               total += (d.on) ? d.base * taxRate : 0;
             });
             diff = total - daytonTotal;
-            
+            currentTotal = total;
+
             // Show total
-            $('.total-raised').html('$' + _.numCommas(total.toFixed(2)));
+            $('.total-raised').html(_.numCurrencyThousand(total));
 
             // Show diff
             if (diff.toFixed(2) == 0) {
@@ -458,13 +468,13 @@
             }
             else if (diff < 0) {
               $diff.removeClass('positive').addClass('negative');
-              diffPrefix = '-$';
+              type = 'negative';
             }
             else {
               $diff.addClass('positive').removeClass('negative');
-              diffPrefix = '+$';
+              type = 'positive';
             }
-            $('.total-diff').html(diffPrefix + _.numCommas(Math.abs(diff).toFixed(2)));
+            $('.total-diff').html(_.numCurrencyThousand(diff, type));
             
             return total;
           };
@@ -472,7 +482,7 @@
           // Build slider function
           var updateTaxRates = function() {
             _.each(taxData, function(d) {
-              $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrency(d.base * taxRate));
+              $('.tax-option[data-id=' + d.id + '] .tax-option-amount').html(_.numCurrencyThousand(d.base * taxRate));
             });
           };
           
