@@ -266,7 +266,56 @@
       /**
        * Responsive creen size styles
        */
-      @media screen and (max-width: 960px) {
+      @media screen and (max-width: 610px) {
+        #game-container {
+          font-size: 80%;
+        }
+      
+        .tax-rate-value-label-container,
+        .slider-container,
+        .tax-rate-value {
+          display: block;
+          padding: .5em .5em;
+          text-align: center;
+          width: 100%;
+          top: auto;
+          margin: auto;
+        }
+        
+        #tax-rate-slider {
+          width: 50%;
+          margin: .5em auto;
+        }
+        
+        .tax-options-container .row .column {
+          width: 50%;
+        }
+        .tax-options-container .row .column.second {
+          float: none;
+          width: auto;
+        }
+        
+        .game-container-inner .total .total-raised-container,
+        .game-container-inner .total .total-diff-container {
+          width: 40%;
+        }
+      }
+      @media screen and (max-width: 400px) {
+        #game-container {
+          font-size: 80%;
+        }
+        
+        .tax-options-container .row .column {
+          width: 100%;
+          float: none;
+          width: auto;
+        }
+        
+        .game-container-inner .total .total-raised-container,
+        .game-container-inner .total .total-diff-container {
+          width: 100%;
+          font-size: 80%;
+        }
       }
     </style>
     
@@ -371,7 +420,7 @@
             <div class="row">
           <% } %>
           
-          <div class="column width_1/4 <% if (count % 4 === 3) { %>last<% } %>">
+          <div class="column width_1/4 <% if (count % 4 === 1) { %>second<% } %> <% if (count % 4 === 3) { %>last<% } %>">
             <div class="cell-inner">
               <div class="tax-option <% if (taxes[t].category) { %>category-<%= taxes[t].category.toLowerCase() %><% } %> <% if (taxes[t].on) { %>enabled<% } %>" data-id="<%= taxes[t].id %>">
                 <span class="tax-title"><%= taxes[t].title %></span>
