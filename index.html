@@ -600,34 +600,8 @@
             });
           };
           
-          // Handle events
-          var handleEvents = function() {
-            $('#game-container').on('click', '.tax-option', function(e) {
-              e.preventDefault();
-              var $this = $(this);
-              var id = $this.attr('data-id');
-              var taxOption = _.find(taxData, function(d) {
-                return (d.id == id);
-              });
-              
-              // Handle enabled
-              $this.toggleClass('enabled');
-              taxOption.on = (taxOption.on) ? false : true;
-              
-              calculateTotal();
-            });
-            
-            $('.tax-rate-current').on('click', function(e) {
-              e.preventDefault();
-              // Stupid slider only handles integers
-              $('#tax-rate-slider').noUiSlider('move', { knob: 0, to: 68.75 });
-              taxRate = 0.06875;
-              displayTaxRate(3);
-              updateTaxRates();
-              calculateTotal();
-            });
-            
-            // More info events with qtip
+          // Add tooltips
+          var addTooltips = function() {
             $('.more-info').qtip({
               content: function(e) {
                 var id = $(this).attr('data-id');
@@ -645,6 +619,38 @@
                 my: 'top center'
               }
             });
+          };
+          
+          // Handle general events
+          var handleEvents = function() {
+            $('#game-container').on('click', '.tax-option', function(e) {
+              e.preventDefault();
+              var $this = $(this);
+              var id = $this.attr('data-id');
+              var taxOption = _.find(taxData, function(d) {
+                return (d.id == id);
+              });
+              
+              // Handle enabled
+              $this.toggleClass('enabled');
+              taxOption.on = (taxOption.on) ? false : true;
+              
+              calculateTotal();
+            });
+            
+            // Handle current tax rate click
+            $('.tax-rate-current').on('click', function(e) {
+              e.preventDefault();
+              // Stupid slider only handles integers
+              $('#tax-rate-slider').noUiSlider('move', { knob: 0, to: 68.75 });
+              taxRate = 0.06875;
+              displayTaxRate(3);
+              updateTaxRates();
+              calculateTotal();
+            });
+            
+            
+            addTooltips();
             
             // Select all or none links
             $('.tax-option-select-all').on('click', function(e) {
@@ -657,8 +663,6 @@
               });
               calculateTotal();
             });
-            
-            // Select all or none links
             $('.tax-option-select-none').on('click', function(e) {
               e.preventDefault();
               
@@ -678,6 +682,7 @@
               $('.tax-options-container').html(templates.taxOptions({ taxes: taxData }));
               updateTaxRates();
               calculateTotal();
+              addTooltips();
             });
             
             // Sort by title
@@ -688,6 +693,7 @@
               $('.tax-options-container').html(templates.taxOptions({ taxes: taxData }));
               updateTaxRates();
               calculateTotal();
+              addTooltips();
             });
             
             // Fixed total thingy
